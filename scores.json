@@ -1,0 +1,38 @@
+{
+  "players": {
+    "1": {
+      "name": "Name 1 Goes Here",
+      "muted": false
+    },
+    "2": {
+      "name": "This is the second name",
+      "muted": false
+    },
+    "3": {
+      "name": "Name 3",
+      "muted": false
+    },
+    "4": {
+      "name": "Name 4",
+      "muted": false
+    },
+    "5": {
+      "name": "Name 5",
+      "muted": false
+    }
+  },
+  "scores": {
+    "1": 0,
+    "2": 4,
+    "3": 0,
+    "4": 5,
+    "5": 0
+  },
+  "timer": {
+    "startTime": 1725469283043,
+    "remainingTime": 0,
+    "isRunning": false,
+    "startTimestamp": 1725474353316,
+    "lastSelectedTime": 120
+  }
+}
