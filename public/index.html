@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debatelords Controller</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+    <img class="top-logo" src="images/debatelords-logo.svg" />
+    <svg version="1.1" id="control-panel" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        x="0px" y="0px" viewBox="0 0 1920 1080" style="enable-background:new 0 0 1920 1080;" xml:space="preserve">
+        <g>
+            <g id="timer-panel">
+                <path class="button-shape"
+                    d="M20,565c-2.76,0-5-2.24-5-5V410c0-2.76,2.24-5,5-5h360c2.76,0,5,2.24,5,5v150c0,2.76-2.24,5-5,5H20z" />
+                <g>
+                    <path class="outline-path" d="M380,410v150H20V410H380 M380,400H20c-5.52,0-10,4.48-10,10v150c0,5.52,4.48,10,10,10h360
+                        c5.52,0,10-4.48,10-10V410C390,404.48,385.52,400,380,400L380,400z" />
+                </g>
+
+                <text class="timer-label" x="200" y="430">CUSTOM TIME</text>
+
+                <g id="custom-time-input" transform="translate(125, 435)">
+                    <rect width="150" height="30" rx="5" ry="5" class="custom-time-rect" />
+                    <text class="timer-label" x="75" y="23" text-anchor="middle" id="custom-time-text">MM:SS</text>
+                </g>
+
+                <text class="timer-label" x="200" y="500">PRESETS</text>
+
+                <g class="preset-button" data-time="30" transform="translate(25, 505)">
+                    <rect width="80" height="50" rx="5" ry="5" class="preset-rect" />
+                    <text class="timer-label" x="40" y="27" text-anchor="middle" alignment-baseline="middle">:30</text>
+                </g>
+                <g class="preset-button" data-time="60" transform="translate(115, 505)">
+                    <rect width="80" height="50" rx="5" ry="5" class="preset-rect" />
+                    <text class="timer-label" x="40" y="27" text-anchor="middle" alignment-baseline="middle">1:00</text>
+                </g>
+                <g class="preset-button" data-time="90" transform="translate(205, 505)">
+                    <rect width="80" height="50" rx="5" ry="5" class="preset-rect" />
+                    <text class="timer-label" x="40" y="27" text-anchor="middle" alignment-baseline="middle">1:30</text>
+                </g>
+                <g class="preset-button" data-time="120" transform="translate(295, 505)">
+                    <rect width="80" height="50" rx="5" ry="5" class="preset-rect" />
+                    <text class="timer-label" x="40" y="27" text-anchor="middle" alignment-baseline="middle">2:00</text>
+                </g>
+            </g>
+
+            <g id="timer-clock">
+                <circle class="outline-path" cx="200" cy="200" r="190" />
+                <path id="countdown-path" class="countdown-path" />
+                <text id="countdown-time" x="200" y="220" text-anchor="middle" alignment-baseline="middle"
+                    style="fill: black; font-size: 150px; font-family: 'helvetica_neueblack_condensed', Arial, sans-serif;">1:00</text>
+            </g>
+        </g>
+        <g id="arrow-panels">
+            <g id="arrow-panel-5">
+                <path class="outline-path" d="M1905,410v460h-274V410H1905 M1905.33,400h-274.66c-5.34,0-9.67,4.48-9.67,10v460c0,5.52,4.33,10,9.67,10
+                    h274.66c5.34,0,9.67-4.48,9.67-10V410C1915,404.48,1910.67,400,1905.33,400L1905.33,400z" />
+            </g>
+            <g id="arrow-panel-4">
+                <path class="outline-path" d="M1601,410v460h-274V410H1601 M1601.33,400h-274.66c-5.34,0-9.67,4.48-9.67,10v460c0,5.52,4.33,10,9.67,10
+                    h274.66c5.34,0,9.67-4.48,9.67-10V410C1611,404.48,1606.67,400,1601.33,400L1601.33,400z" />
+            </g>
+            <g id="arrow-panel-3">
+                <path class="outline-path" d="M1297,410v460h-274V410H1297 M1297.33,400h-274.66c-5.34,0-9.67,4.48-9.67,10v460c0,5.52,4.33,10,9.67,10
+                    h274.66c5.34,0,9.67-4.48,9.67-10V410C1307,404.48,1302.67,400,1297.33,400L1297.33,400z" />
+            </g>
+            <g id="arrow-panel-2">
+                <path class="outline-path" d="M993,410v460H719V410H993 M993.33,400H718.67c-5.34,0-9.67,4.48-9.67,10v460c0,5.52,4.33,10,9.67,10h274.66
+                    c5.34,0,9.67-4.48,9.67-10V410C1003,404.48,998.67,400,993.33,400L993.33,400z" />
+            </g>
+            <g id="arrow-panel-1">
+                <path class="outline-path" d="M689,410v460H415V410H689 M689.33,400H414.67c-5.34,0-9.67,4.48-9.67,10v460c0,5.52,4.33,10,9.67,10h274.66
+                    c5.34,0,9.67-4.48,9.67-10V410C699,404.48,694.67,400,689.33,400L689.33,400z" />
+            </g>
+        </g>
+        <g id="mutes">
+            <g id="mute-button-1">
+                <path class="mute-button" data-player="1" d="M414.67,1070c-2.58,0-4.67-2.02-4.67-4.5v-171c0-2.48,2.1-4.5,4.67-4.5h274.66c2.58,0,4.67,2.02,4.67,4.5v171
+                    c0,2.48-2.1,4.5-4.67,4.5H414.67z"></path>
+                <path class="outline-path" d="M689,895v170H415V895H689 M689.33,885H414.67c-5.34,0-9.67,4.25-9.67,9.5v171c0,5.25,4.33,9.5,9.67,9.5
+                    h274.66c5.34,0,9.67-4.25,9.67-9.5v-171C699,889.25,694.67,885,689.33,885L689.33,885z"></path>
+                <text x="552" y="986" class="mute-text" text-anchor="middle" dominant-baseline="middle">
+                    Mute
+                </text>
+            </g>
+            <g id="mute-button-2">
+                <path class="mute-button" data-player="2" d="M718.67,1070c-2.58,0-4.67-2.02-4.67-4.5v-171c0-2.48,2.1-4.5,4.67-4.5h274.66c2.58,0,4.67,2.02,4.67,4.5v171
+                    c0,2.48-2.1,4.5-4.67,4.5H718.67z"></path>
+                <path class="outline-path" d="M993,895v170H719V895H993 M993.33,885H718.67c-5.34,0-9.67,4.25-9.67,9.5v171c0,5.25,4.33,9.5,9.67,9.5
+                    h274.66c5.34,0,9.67-4.25,9.67-9.5v-171C1003,889.25,998.67,885,993.33,885L993.33,885z"></path>
+                <text x="856" y="986" class="mute-text" text-anchor="middle" dominant-baseline="middle">
+                    Mute
+                </text>
+            </g>
+            <g id="mute-button-3">
+                <path class="mute-button" data-player="3" d="M1022.67,1070c-2.58,0-4.67-2.02-4.67-4.5v-171c0-2.48,2.1-4.5,4.67-4.5h274.66c2.58,0,4.67,2.02,4.67,4.5
+                    v171c0,2.48-2.1,4.5-4.67,4.5H1022.67z"></path>
+                <path class="outline-path" d="M1297,895v170h-274V895H1297 M1297.33,885h-274.66c-5.34,0-9.67,4.25-9.67,9.5v171c0,5.25,4.33,9.5,9.67,9.5
+                    h274.66c5.34,0,9.67-4.25,9.67-9.5v-171C1307,889.25,1302.67,885,1297.33,885L1297.33,885z"></path>
+                <text x="1160" y="986" class="mute-text" text-anchor="middle" dominant-baseline="middle">
+                    Mute
+                </text>
+            </g>
+            <g id="mute-button-4">
+                <path class="mute-button" data-player="4" d="M1326.67,1070c-2.58,0-4.67-2.02-4.67-4.5v-171c0-2.48,2.1-4.5,4.67-4.5h274.66c2.58,0,4.67,2.02,4.67,4.5
+                    v171c0,2.48-2.1,4.5-4.67,4.5H1326.67z"></path>
+                <path class="outline-path" d="M1601,895v170h-274V895H1601 M1601.33,885h-274.66c-5.34,0-9.67,4.25-9.67,9.5v171c0,5.25,4.33,9.5,9.67,9.5
+                    h274.66c5.34,0,9.67-4.25,9.67-9.5v-171C1611,889.25,1606.67,885,1601.33,885L1601.33,885z"></path>
+                <text x="1464" y="986" class="mute-text" text-anchor="middle" dominant-baseline="middle">
+                    Mute
+                </text>
+            </g>
+            <g id="mute-button-5">
+                <path class="mute-button" data-player="5" d="M1630.67,1070c-2.58,0-4.67-2.02-4.67-4.5v-171c0-2.48,2.1-4.5,4.67-4.5h274.66c2.58,0,4.67,2.02,4.67,4.5
+                    v171c0,2.48-2.1,4.5-4.67,4.5H1630.67z"></path>
+                <path class="outline-path" d="M1905,895v170h-274V895H1905 M1905.33,885h-274.66c-5.34,0-9.67,4.25-9.67,9.5v171c0,5.25,4.33,9.5,9.67,9.5
+                    h274.66c5.34,0,9.67-4.25,9.67-9.5v-171C1915,889.25,1910.67,885,1905.33,885L1905.33,885z"></path>
+                <text x="1768" y="986" class="mute-text" text-anchor="middle" dominant-baseline="middle">
+                    Mute
+                </text>
+            </g>
+        </g>
+        <g id="scores">
+            <g id="score-panel-1">
+                <path class="score-panel" d="M414.67,390c-2.58,0-4.67-1.92-4.67-4.29V274.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H414.67z" />
+                <path class="outline-path"
+                    d="M689,275v110l-274,0V275H689 M689.33,265H414.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V274.29C699,269.16,694.67,265,689.33,265L689.33,265z" />
+                <text id="score-text-1" x="552" y="390" class="score-text" text-anchor="middle">000</text>
+            </g>
+            <g id="score-panel-2">
+                <path class="score-panel" d="M718.67,390c-2.58,0-4.67-1.92-4.67-4.29V274.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H718.67z" />
+                <path class="outline-path"
+                    d="M993,275v110l-274,0V275H993 M993.33,265H718.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V274.29C1003,269.16,998.67,265,993.33,265L993.33,265z" />
+                <text id="score-text-2" x="856" y="390" class="score-text" text-anchor="middle">000</text>
+            </g>
+            <g id="score-panel-3">
+                <path class="score-panel" d="M1022.67,390c-2.58,0-4.67-1.92-4.67-4.29V274.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1022.67z" />
+                <path class="outline-path"
+                    d="M1297,275v110l-274,0V275H1297 M1297.33,265h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V274.29C1307,269.16,1302.67,265,1297.33,265L1297.33,265z" />
+                <text id="score-text-3" x="1160" y="390" class="score-text" text-anchor="middle">000</text>
+            </g>
+            <g id="score-panel-4">
+                <path class="score-panel" d="M1326.67,390c-2.58,0-4.67-1.92-4.67-4.29V274.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1326.67z" />
+                <path class="outline-path"
+                    d="M1601,275v110l-274,0V275H1601 M1601.33,265h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V274.29C1611,269.16,1606.67,265,1601.33,265L1601.33,265z" />
+                <text id="score-text-4" x="1464" y="390" class="score-text" text-anchor="middle">000</text>
+            </g>
+            <g id="score-panel-5">
+                <path class="score-panel" d="M1630.67,390c-2.58,0-4.67-1.92-4.67-4.29V274.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1630.67z" />
+                <path class="outline-path"
+                    d="M1905,275v110l-274,0V275H1905 M1905.33,265h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V274.29C1915,269.16,1910.67,265,1905.33,265L1905.33,265z" />
+                <text id="score-text-5" x="1768" y="390" class="score-text" text-anchor="middle">000</text>
+            </g>
+        </g>
+        <g id="names">
+            <g id="name-panel-1">
+                <path class="name-panel" d="M414.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H414.67z" />
+                <path class="outline-path"
+                    d="M689,138v110l-274,0V138H689 M689.33,128H414.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C699,132.16,694.67,128,689.33,128L689.33,128z" />
+                    <foreignObject x="417" y="143" width="270" height="100">
+                        <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 1</div>
+                      </foreignObject>
+            </g>
+            <g id="name-panel-2">
+                <path class="name-panel" d="M718.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H718.67z" />
+                <path class="outline-path"
+                    d="M993,138v110l-274,0V138H993 M993.33,128H718.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1003,132.16,998.67,128,993.33,128L993.33,128z" />
+                <foreignObject x="721" y="143" width="270" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 2</div>
+                </foreignObject>
+            </g>
+            <g id="name-panel-3">
+                <path class="name-panel" d="M1022.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1022.67z" />
+                <path class="outline-path"
+                    d="M1297,138v110l-274,0V138H1297 M1297.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1307,132.16,1302.67,128,1297.33,128L1297.33,128z" />
+                <foreignObject x="1025" y="143" width="270" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 3</div>
+                </foreignObject>
+            </g>
+            <g id="name-panel-4">
+                <path class="name-panel" d="M1326.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1326.67z" />
+                <path class="outline-path"
+                    d="M1601,138v110l-274,0V138H1601 M1601.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1611,132.16,1606.67,128,1601.33,128L1601.33,128z" />
+                <foreignObject x="1329" y="143" width="270" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 4</div>
+                </foreignObject>
+            </g>
+            <g id="name-panel-5">
+                <path class="name-panel" d="M1630.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
+                    c2.58,0,4.67,1.92,4.67,4.29v111.43c0,2.36-2.1,4.29-4.67,4.29H1630.67z" />
+                <path class="outline-path"
+                    d="M1905,138v110l-274,0V138H1905 M1905.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
+                    c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1915,132.16,1910.67,128,1905.33,128L1905.33,128z" />
+                <foreignObject x="1633" y="143" width="270" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 5</div>
+                </foreignObject>
+            </g>
+        </g>
+        <g id="timer-controls">
+            <g id="timer-reset">
+                <path id="reset-background" class="button reset"
+                    d="M214.5,1070c-2.48,0-4.5-2.02-4.5-4.5v-171c0-2.48,2.02-4.5,4.5-4.5h171c2.48,0,4.5,2.02,4.5,4.5v171 c0,2.48-2.02,4.5-4.5,4.5H214.5z" />
+                <path class="outline-path"
+                    d="M385,895v170H215V895H385 M385.5,885h-171c-5.25,0-9.5,4.25-9.5,9.5v171c0,5.25,4.25,9.5,9.5,9.5h171 c5.25,0,9.5-4.25,9.5-9.5v-171C395,889.25,390.75,885,385.5,885L385.5,885z" />
+                <text x="300" y="985" class="timer-text" text-anchor="middle" dominant-baseline="middle">Reset</text>
+            </g>
+
+            <g id="timer-stop">
+                <path id="stop-background" class="button stop"
+                    d="M14.5,1070c-2.48,0-4.5-2.02-4.5-4.5v-171c0-2.48,2.02-4.5,4.5-4.5h171c2.48,0,4.5,2.02,4.5,4.5v171 c0,2.48-2.02,4.5-4.5,4.5H14.5z" />
+                <path class="outline-path"
+                    d="M185,895v170H15V895H185 M185.5,885h-171c-5.25,0-9.5,4.25-9.5,9.5v171c0,5.25,4.25,9.5,9.5,9.5h171 c5.25,0,9.5-4.25,9.5-9.5v-171C195,889.25,190.75,885,185.5,885L185.5,885z" />
+                <text id="stop-text" x="100" y="985" class="timer-text" text-anchor="middle"
+                    dominant-baseline="middle">Stop</text>
+            </g>
+
+            <g id="timer-start">
+                <path id="start-background" class="button start" d="M14.75,875c-2.62,0-4.75-2.02-4.75-4.5v-171c0-2.48,2.13-4.5,4.75-4.5h370.5c2.62,0,4.75,2.02,4.75,4.5v171
+                    c0,2.48-2.13,4.5-4.75,4.5H14.75z" />
+                <path class="outline-path" d="M385,700v170l-370,0V700H385 M385.25,690H14.75C9.37,690,5,694.25,5,699.5v171c0,5.25,4.37,9.5,9.75,9.5
+                    h370.5c5.38,0,9.75-4.25,9.75-9.5v-171C395,694.25,390.63,690,385.25,690z" />
+                <text id="start-text" x="200" y="790" class="timer-text" text-anchor="middle"
+                    dominant-baseline="middle">Start</text>
+            </g>
+        </g>
+        <g id="arrows-5">
+            <g id="down-arrow-5" class="arrow">
+                <polygon class="down-arrow"
+                    points="1681.03,745 1713,745 1713,665 1823,665 1823,745 1854.97,745 1768,823.27 		" />
+                <path class="outline-path" d="M1818,670v70v10h10h13.94L1768,816.55L1694.06,750H1708h10v-10v-70H1818 M1828,660h-120v80h-40l100,90l100-90
+                    h-40V660L1828,660z" />
+            </g>
+            <g id="up-arrow-5" class="arrow">
+                <polygon class="up-arrow"
+                    points="1713,615 1713,535 1681.03,535 1768,456.73 1854.97,535 1823,535 1823,615 		" />
+                <path class="outline-path" d="M1768,463.45l73.94,66.55H1828h-10v10v70h-100v-70v-10h-10h-13.94L1768,463.45 M1768,450l-100,90h40v80h120
+                    v-80h40L1768,450L1768,450z" />
+            </g>
+        </g>
+        <g id="arrows-4">
+            <g id="down-arrow-4" class="arrow">
+                <polygon class="down-arrow"
+                    points="1377.03,745 1409,745 1409,665 1519,665 1519,745 1550.97,745 1464,823.27 		" />
+                <path class="outline-path" d="M1514,670v70v10h10h13.94L1464,816.55L1390.06,750H1404h10v-10v-70H1514 M1524,660h-120v80h-40l100,90l100-90
+                    h-40V660L1524,660z" />
+            </g>
+            <g id="up-arrow-4" class="arrow">
+                <polygon class="up-arrow"
+                    points="1409,615 1409,535 1377.03,535 1464,456.73 1550.97,535 1519,535 1519,615 		" />
+                <path class="outline-path" d="M1464,463.45l73.94,66.55H1524h-10v10v70h-100v-70v-10h-10h-13.94L1464,463.45 M1464,450l-100,90h40v80h120
+                    v-80h40L1464,450L1464,450z" />
+            </g>
+        </g>
+        <g id="arrows-3">
+            <g id="down-arrow-3" class="arrow">
+                <polygon class="down-arrow"
+                    points="1073.03,745 1105,745 1105,665 1215,665 1215,745 1246.97,745 1160,823.27 		" />
+                <path class="outline-path" d="M1210,670v70v10h10h13.94L1160,816.55L1086.06,750H1100h10v-10v-70H1210 M1220,660h-120v80h-40l100,90l100-90
+                    h-40V660L1220,660z" />
+            </g>
+            <g id="up-arrow-3" class="arrow">
+                <polygon class="up-arrow"
+                    points="1105,615 1105,535 1073.03,535 1160,456.73 1246.97,535 1215,535 1215,615 		" />
+                <path class="outline-path" d="M1160,463.45l73.94,66.55H1220h-10v10v70h-100v-70v-10h-10h-13.94L1160,463.45 M1160,450l-100,90h40v80h120
+                    v-80h40L1160,450L1160,450z" />
+            </g>
+        </g>
+        <g id="arrows-2">
+            <g id="down-arrow-2" class="arrow">
+                <polygon class="down-arrow"
+                    points="769.03,745 801,745 801,665 911,665 911,745 942.97,745 856,823.27 		" />
+                <path class="outline-path" d="M906,670v70v10h10h13.94L856,816.55L782.06,750H796h10v-10v-70H906 M916,660H796v80h-40l100,90l100-90h-40
+                    V660L916,660z" />
+            </g>
+            <g id="up-arrow-2" class="arrow">
+                <polygon class="up-arrow"
+                    points="801,615 801,535 769.03,535 856,456.73 942.97,535 911,535 911,615 		" />
+                <path class="outline-path" d="M856,463.45L929.94,530H916h-10v10v70H806v-70v-10h-10h-13.94L856,463.45 M856,450l-100,90h40v80h120v-80h40
+                    L856,450L856,450z" />
+            </g>
+        </g>
+        <g id="arrows-1">
+            <g id="down-arrow-1" class="arrow">
+                <polygon class="down-arrow"
+                    points="465.03,745 497,745 497,665 607,665 607,745 638.97,745 552,823.27 		" />
+                <path class="outline-path" d="M602,670v70v10h10h13.94L552,816.55L478.06,750H492h10v-10v-70H602 M612,660H492v80h-40l100,90l100-90h-40
+                    V660L612,660z" />
+            </g>
+            <g id="up-arrow-1" class="arrow">
+                <polygon class="up-arrow"
+                    points="497,615 497,535 465.03,535 552,456.73 638.97,535 607,535 607,615 		" />
+                <path class="outline-path" d="M552,463.45L625.94,530H612h-10v10v70H502v-70v-10h-10h-13.94L552,463.45 M552,450l-100,90h40v80h120v-80h40
+                    L552,450L552,450z" />
+            </g>
+        </g>
+        <g id="extra-button-1" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M425,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5-5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H425z" />
+            <path class="outline-path" d="M545,20v90H425V20H545 M545,10H425c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120c5.52,0,10-4.48,10-10
+                V20C555,14.48,550.52,10,545,10L545,10z" />
+        </g>
+        <g id="extra-button-2" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M575,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5-5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H575z" />
+            <path class="outline-path" d="M695,20v90H575V20H695 M695,10H575c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120c5.52,0,10-4.48,10-10
+                V20C705,14.48,700.52,10,695,10L695,10z" />
+        </g>
+        <g id="extra-button-3" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M725,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5-5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H725z" />
+            <path class="outline-path" d="M845,20v90H725V20H845 M845,10H725c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120c5.52,0,10-4.48,10-10
+                V20C855,14.48,850.52,10,845,10L845,10z" />
+        </g>
+        <g id="extra-button-4" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M875,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5-5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H875z" />
+            <path class="outline-path" d="M995,20v90H875V20H995 M995,10H875c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120c5.52,0,10-4.48,10-10
+                V20C1005,14.48,1000.52,10,995,10L995,10z" />
+        </g>
+        <g id="extra-button-5" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1025,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5,5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1025z" />
+            <path class="outline-path" d="M1145,20v90h-120V20H1145 M1145,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1155,14.48,1150.52,10,1145,10L1145,10z" />
+        </g>
+        <g id="extra-button-6" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1175,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5-5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1175z" />
+            <path class="outline-path" d="M1295,20v90h-120V20H1295 M1295,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1305,14.48,1300.52,10,1295,10L1295,10z" />
+        </g>
+        <g id="extra-button-7" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1325,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5,5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1325z" />
+            <path class="outline-path" d="M1445,20v90h-120V20H1445 M1445,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1455,14.48,1450.52,10,1445,10L1445,10z" />
+        </g>
+        <g id="extra-button-8" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1475,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5,5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1475z" />
+            <path class="outline-path" d="M1595,20v90h-120V20H1595 M1595,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1605,14.48,1600.52,10,1595,10L1595,10z" />
+        </g>
+        <g id="extra-button-9" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1625,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5,5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1625z" />
+            <path class="outline-path" d="M1745,20v90h-120V20H1745 M1745,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1755,14.48,1750.52,10,1745,10L1745,10z" />
+        </g>
+        <g id="extra-button-10" class="extra-button-hidden">
+            <path class="extra-button"
+                d="M1775,115c-2.76,0-5-2.24-5-5V20c0-2.76,2.24-5,5,5h120c2.76,0,5,2.24,5,5v90c0,2.76-2.24,5-5,5H1775z" />
+            <path class="outline-path" d="M1895,20v90h-120V20H1895 M1895,10h-120c-5.52,0-10,4.48-10,10v90c0,5.52,4.48,10,10,10h120
+                c5.52,0,10-4.48,10-10V20C1905,14.48,1900.52,10,1895,10L1895,10z" />
+        </g>
+    </svg>
+    <script src="js/scripts.js"></script>
+    <script src="js/scores.js"></script>
+    <script src="js/mute.js"></script>
+</body>
+
+</html>
