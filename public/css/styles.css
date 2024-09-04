@@ -1,0 +1,279 @@
+@font-face {
+    font-family: 'helvetica_neueblack_condensed';
+    src: url('fonts/helveticaneue-blackcondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-blackcondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neueBlkExCn';
+    src: url('fonts/helveticaneue-blackextendedcondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-blackextendedcondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neuecondensed';
+    src: url('fonts/helveticaneue-condensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-condensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neueheavy_condensed';
+    src: url('fonts/helveticaneue-heavycondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-heavycondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neueMdCn';
+    src: url('fonts/helveticaneue-mediumcondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-mediumcondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neuethin_condensed';
+    src: url('fonts/helveticaneue-thincondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-thincondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'helvetica_neueultraLtCn';
+    src: url('fonts/helveticaneue-ultralightcondensed-webfont.woff2') format('woff2'),
+        url('fonts/helveticaneue-ultralightcondensed-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ErbosDraco1stNBP-Regular';
+    src: url('fonts/ErbosDraco1stNBP-Regular.woff2') format('woff2'),
+        url('fonts/ErbosDraco1stNBP-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #053876;
+    overflow: hidden;
+    user-select: none;
+}
+
+.top-logo {
+    width: 75vw;
+    max-width: 2000px;
+    max-height: 100px;
+    height: auto;
+    position: absolute;
+    top: 5px;
+    right: 0;
+    transform-origin: right;
+    z-index: 10;
+}
+
+.name-text,
+.mute-text {
+    font-family: 'helvetica_neueBlkExCn', Arial, sans-serif;
+    text-transform: uppercase;
+}
+
+.name-text {
+    fill: #000000;
+    font-size: 40px;
+}
+
+.mute-text {
+    fill: black;
+    font-size: 80px;
+}
+
+.mute-button {
+    cursor: pointer;
+    fill: grey;
+}
+
+.mute-button.active {
+    fill: red;
+}
+
+.mute-button.active:hover {
+    fill: darkred;
+}
+
+.mute-button:hover {
+    fill: rgb(70, 70, 70) !important;
+}
+
+.name-panel {
+    fill: #9ed4fa;
+}
+
+.name-input {
+    width: 100%;
+    height: 100%;
+    font-size: 40px;
+    text-align: center;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    color: black;
+    font-family: 'helvetica_neueBlkExCn', Arial, sans-serif;
+    resize: none;
+    overflow: hidden;
+    white-space: pre-wrap;
+    line-height: 40px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+}
+
+.name-input-wrapper {
+    display: block;
+    width: 100%;
+    height: 100%;
+    font-size: 40px; /* Adjust font size as needed */
+    font-family: 'helvetica_neueBlkExCn', Arial, sans-serif; /* Use your preferred font */
+    text-align: center;
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Ensure words wrap correctly */
+    overflow: hidden; /* Prevent overflow if text is too long */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px; /* Add some padding if needed */
+    box-sizing: border-box;
+    text-transform: uppercase;
+    text-anchor: middle;
+    text-align: center;
+
+}
+
+.name-input:focus {
+    outline: none;
+}
+
+.timer-text {
+    font-family: 'helvetica_neueblack_condensed', Arial, sans-serif;
+    font-size: 50px;
+    text-transform: uppercase;
+}
+
+#timer-panel {
+    fill: #9ed4fa;
+}
+
+#timer-clock {
+    fill: #ffffff;
+}
+
+.timer-label {
+    font-family: 'helvetica_neueblack_condensed', Arial, sans-serif;
+    fill: black;
+    text-align: center;
+    text-anchor: middle;
+    font-size: 20px;
+}
+
+.preset-rect,
+.custom-time-rect {
+    fill: #e0e0e0;
+    stroke: black;
+    cursor: pointer;
+    transition: fill 0.2s;
+}
+
+.preset-rect:hover {
+    fill: #c0c0c0;
+}
+
+#start-background:hover {
+    fill: lightgreen;
+}
+
+#stop-background:hover {
+    fill: lightcoral;
+}
+
+#reset-background:hover {
+    fill: lightgoldenrodyellow;
+}
+
+.outline-path {
+    fill: #ffffff;
+    z-index: 10;
+}
+
+.up-arrow {
+    fill: #c01c7b;
+}
+
+.up-arrow:hover {
+    fill: #7e1251;
+}
+
+.down-arrow {
+    fill: #ee6ea4;
+}
+
+.down-arrow:hover {
+    fill: #a74b71;
+}
+
+.score-text {
+    fill: #c01c7b;
+    font-size: 210px;
+    font-family: 'ErbosDraco1stNBP-Regular', Arial, sans-serif;
+    text-shadow: 0 0 5px #ffff00;
+}
+
+.negative-score {
+    color: black;
+}
+
+.score-panel {
+    fill: white;
+}
+
+.start {
+    fill: green;
+}
+
+.stop {
+    fill: red;
+}
+
+.reset {
+    fill: orange;
+}
+
+.extra-button-hidden {
+    display: none;
+}
+
+.countdown-path {
+    fill: red;
+}
+
+.preset-button:hover rect,
+#custom-time-input:hover rect {
+    fill: #c0c0c0;
+}
+
+.preset-button rect,
+#custom-time-input rect {
+    transition: fill 0.2s ease;
+}
