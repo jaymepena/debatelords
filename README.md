@@ -40,9 +40,9 @@ npm
    ```sh
    npm install
    ```
-   Run!
+3. Run!
    ```sh
-3. node server.js
-    ```
+   node server.js
+   ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
