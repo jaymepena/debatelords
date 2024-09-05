@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const resetButton = document.getElementById('timer-reset');
   const presetButtons = document.querySelectorAll('.preset-button');
   const customTimeInput = document.getElementById('custom-time-input');
-  const muteButtons = document.querySelectorAll('.mute-button'); // Select paths with class 'mute-button'
+  const muteButtons = document.querySelectorAll('.mute-button');
 
   let originalTime = 60;
   let remainingTime = originalTime;
@@ -51,6 +51,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
     };
   }
 
+  socket.on('initData', (data) => {
+    if (data.timer) {
+      remainingTime = data.timer.remainingTime;
+      isRunning = data.timer.isRunning;
+      originalTime = data.timer.lastSelectedTime;
+      updateTimerDisplay(remainingTime);
+      updatePieChart(remainingTime, originalTime);
+
+      if (isRunning) {
+        requestAnimationFrame(syncTimerUpdate);
+      }
+    }
+  });
+  
   function syncTimerUpdate() {
     if (isRunning) {
       const now = Date.now();
