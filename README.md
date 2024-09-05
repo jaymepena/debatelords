@@ -34,7 +34,7 @@ Talent will press the button, the things will update, the world will keep spinni
 
 ### Installation
 
-1. Update the .env file to the server PC's IP address
+1. Update the .env file to the server PC's IP address (or leave LocalHost for demo)
 2. Install NPM packages
    ```sh
    npm install
