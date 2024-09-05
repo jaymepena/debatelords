@@ -52,6 +52,8 @@ Talent will press the button, the things will update, the world will keep spinni
 # IIS GUIDE 
 ### Installation
 
+Browse to Control Panel -> Programs and Features
+
 1. Open the "Turn Windows Features On or Off" dialogue box
 2. Select "Internet Information Services" and "Internet Information Services Hostable Web Core" and ensure it is checked
 3. Hit ok
