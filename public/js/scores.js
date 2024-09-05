@@ -9,7 +9,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
       return `-${Math.abs(score).toString().padStart(2, '0')}`;
     }
   }
-
+  
+  // Listen for the initial data when the page loads
+  socket.on("initData", (data) => {
+    Object.keys(data.scores).forEach((panelId) => {
+      let scoreElement = document.getElementById(`score-text-${panelId}`);
+      if (scoreElement) {
+        scoreElement.textContent = formatScore(data.scores[panelId]);
+      }
+    });
+  });
+  
   // Handle score increase
   document.querySelectorAll('.up-arrow').forEach(button => {
     button.addEventListener('click', function() {
