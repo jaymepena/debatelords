@@ -27,10 +27,10 @@ Talent will press the button, the things will update, the world will keep spinni
 
 ### Prerequisites
 
-NodeJS (20.0+)
-npm
-IIS running on Windows 10/11
-A sense of self worth
+- NodeJS (20.0+)
+- npm
+- IIS running on Windows 10/11
+- A sense of self worth
 
 ### Installation
 
