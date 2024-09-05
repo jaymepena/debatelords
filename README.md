@@ -39,11 +39,12 @@ Talent will press the button, the things will update, the world will keep spinni
    ```sh
    npm install
    ```
-3. Run!
+3. Install IIS (see Below)
+4. Run!
    ```sh
    node server.js
    ```
-4. Open <a>localhost:3000</a> in a web browser
+5. Open <a>localhost:3000</a> in a web browser
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
