@@ -43,6 +43,7 @@ Talent will press the button, the things will update, the world will keep spinni
    ```sh
    node server.js
    ```
+4. Open <a>localhost:3000</a> in a web browser
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
