@@ -1,4 +1,4 @@
-<a id="readme-top"></a>
+ <a id="readme-top"></a>
 
 <!-- PROJECT LOGO -->
 <br />
@@ -18,7 +18,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About
 
-Hasan will press the button, the things will update, the world will keep spinning.
+Talent will press the button, the things will update, the world will keep spinning.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -27,8 +27,9 @@ Hasan will press the button, the things will update, the world will keep spinnin
 
 ### Prerequisites
 
+NodeJS (20.0+)
 npm
-
+IIS running on Windows 10/11
 A sense of self worth
 
 ### Installation
@@ -46,4 +47,11 @@ A sense of self worth
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- IIS GUIDE -->
-# IIS GUIDE COMING SOON
+# IIS GUIDE 
+### Installation
+
+1. Open the "Turn Windows Features On or Off" dialogue box
+2. Select "Internet Information Services" and ensure it is checked
+3. Hit ok
+4. Make yourself another coffee or tea
+5. Its done! Panel should now be accessible at [yourip]:3000 
