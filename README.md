@@ -54,4 +54,6 @@ A sense of self worth
 2. Select "Internet Information Services" and "Internet Information Services Hostable Web Core" and aensure it is checked
 3. Hit ok
 4. Make yourself another coffee or tea
-5. Its done! Panel should now be accessible at [yourip]:3000 
+5. Its done! Panel should now be accessible at [yourip]:3000
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
