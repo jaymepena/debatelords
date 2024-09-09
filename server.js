@@ -1,31 +1,141 @@
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config();
 
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const fs = require("fs");
-
+const axios = require("axios");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+const path = require("path");
 
-// Use environment variables for host and port
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;
+const clientId = process.env.TILTIFY_CLIENT_ID;
+const clientSecret = process.env.TILTIFY_CLIENT_SECRET;
+const campaignId = process.env.TILTIFY_CAMPAIGN_ID;
+const donosLastMins = 240;
+const timeToCheck = 60;
 
 app.use(express.static("public"));
+
+// Helper function to get OAuth token
+async function getOAuthToken() {
+  try {
+    const response = await axios.post("https://v5api.tiltify.com/oauth/token", {
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: "client_credentials",
+    });
+
+    accessToken = response.data.access_token;
+    console.log("OAuth token acquired:", accessToken);
+
+    // Refresh the token when it expires
+    setTimeout(getOAuthToken, (response.data.expires_in - 60) * 1000); // refresh 1 minute before expiry
+  } catch (error) {
+    console.error("Error fetching OAuth token:", error);
+  }
+}
+
+app.get("/milestones", async (req, res) => {
+  try {
+    const response = await axios.get(
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    const milestones = response.data.data.map((milestone) => ({
+      name: milestone.name,
+      amount: parseFloat(milestone.amount.value),
+    }));
+
+    res.json(milestones);
+  } catch (error) {
+    console.error("Error fetching milestones:", error);
+    res.status(500).json({ error: "Failed to fetch milestones" });
+  }
+});
+
+app.get("/campaign-id", (req, res) => {
+  res.json({ campaignId: process.env.TILTIFY_CAMPAIGN_ID });
+});
+
+let accessToken = null;
+let currentAmount = 0;
+let donationGoal = 5000;
+const donationFile = "donations.json";
+
+// Debounce helper to delay actions (prevents multiple triggers during file edits)
+let debounceTimeout = null;
+const debounce = (func, delay) => {
+  if (debounceTimeout) clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(func, delay);
+};
+
+const loadDonations = () => {
+  try {
+    if (fs.existsSync(donationFile)) {
+      const savedData = fs.readFileSync(donationFile, "utf-8");
+      const parsedData = JSON.parse(savedData);
+      currentAmount = parsedData.total || 0;
+      donationGoal = parsedData.goal || 5000;
+      console.log(
+        `Loaded donations: $${currentAmount}, Goal: $${donationGoal}`
+      );
+    }
+  } catch (error) {
+    console.error("Error reading or parsing donations.json:", error.message);
+  }
+};
+
+// Call it once when the server starts
+loadDonations();
+
+app.get("/current-donations", (req, res) => {
+  res.json({ total: currentAmount, goal: donationGoal });
+});
+
+// Watch for changes to the donations.json file with debounce and error handling
+fs.watch(donationFile, (eventType) => {
+  if (eventType === "change") {
+    debounce(() => {
+      loadDonations(); // Load new total and goal from the file
+      io.emit("goalUpdate", { newGoal: donationGoal });
+      io.emit("newDonation", { amount: currentAmount });
+    }, 500); // 500ms delay to ensure file is fully written
+  }
+});
+
+// Load existing donations and goal from the file (if it exists)
+if (fs.existsSync(donationFile)) {
+  const savedData = JSON.parse(fs.readFileSync(donationFile, "utf-8"));
+  currentAmount = savedData.total || 0; // Set the new total directly
+  donationGoal = savedData.goal || 5000; // Set the new goal directly
+  console.log(
+    `Loaded total donations: $${currentAmount}, goal: $${donationGoal}`
+  );
+} else {
+  console.log("No existing donations file found, starting fresh.");
+}
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-// Function to load data from JSON file
+// Function to load data from JSON file for the scores
 function loadData() {
   const dataFile = "scores.json";
   let data = {};
 
   try {
+    // Load existing data from scores.json
     data = JSON.parse(fs.readFileSync(dataFile, "utf8"));
+
+    // Ensure default structures exist
     if (!data.players) {
       data.players = {
         1: { name: "Name 1", muted: false },
@@ -39,7 +149,12 @@ function loadData() {
       data.scores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
     }
     if (!data.timer) {
-      data.timer = { remainingTime: 60, isRunning: false, startTimestamp: null, lastSelectedTime: 60 };
+      data.timer = {
+        remainingTime: 60,
+        isRunning: false,
+        startTimestamp: null,
+        lastSelectedTime: 60,
+      };
     }
   } catch (err) {
     console.error("Error reading scores.json:", err);
@@ -52,34 +167,67 @@ function loadData() {
         5: { name: "Name 5", muted: false },
       },
       scores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
-      timer: { remainingTime: 60, isRunning: false, startTimestamp: null, lastSelectedTime: 60 },
+      timer: {
+        remainingTime: 60,
+        isRunning: false,
+        startTimestamp: null,
+        lastSelectedTime: 60,
+      },
     };
   }
   return data;
 }
 
-// Socket.io connection
+/**
+ * I had to Google what to do for the
+ * broken scores/mutes and it says I was doing a "shallow merge",
+ * or only merging the top-level properties of objects. So here you go,
+ * enjoy the deepMerge, the function that will update changes
+ * to the scores, players, or mutes and not the unassociated things.
+ * Shallow Merge - overwrite the entire object
+ * Deep Merge - overwrite specific portions of the scores.json
+ */
+function deepMerge(target, source) {
+  for (let key in source) {
+    if (source[key] && typeof source[key] === "object") {
+      if (!target[key]) target[key] = {};
+      deepMerge(target[key], source[key]);
+    } else {
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  // Re-load data from the JSON file for every new connection
   let data = loadData();
-  socket.emit('initData', data);
+  socket.emit("initData", data);
 
   socket.on("scoreUpdate", (update) => {
-    data.scores[update.panel] = update.score;
-    io.emit("updateScore", update);
-    saveDataToFile(data);
+    if (data.scores && data.scores[update.panel] !== undefined) {
+      data.scores[update.panel] = update.score;
+
+      io.emit("updateScore", update);
+
+      savePartialDataToFile({ scores: data.scores });
+    } else {
+      console.error("Score update error: Invalid panel or score data");
+    }
   });
 
   socket.on("muteUpdate", (update) => {
     const playerId = update.player;
-    const isMuted = update.muted;
 
     if (data.players && data.players[playerId]) {
-      data.players[playerId].muted = isMuted;
-      io.emit("updateMute", { player: playerId, muted: isMuted });
-      saveDataToFile(data);
+      data.players[playerId].muted = update.muted;
+
+      io.emit("updateMute", { player: playerId, muted: update.muted });
+
+      savePartialDataToFile({ players: data.players });
+    } else {
+      console.error("Mute update error: Invalid player data");
     }
   });
 
@@ -89,20 +237,43 @@ io.on("connection", (socket) => {
 
     if (data.players && data.players[playerId]) {
       data.players[playerId].name = playerName;
+
       io.emit("updateName", { playerId, name: playerName });
-      saveDataToFile(data);
+
+      savePartialDataToFile({ players: data.players });
     }
   });
+
+  function updateTimer(data) {
+    if (data.timer.isRunning) {
+      const elapsedTime = (Date.now() - data.timer.startTimestamp) / 1000;
+      data.timer.remainingTime = Math.max(
+        0,
+        data.timer.remainingTime - elapsedTime
+      );
+      data.timer.startTimestamp = Date.now();
+
+      io.emit("timerUpdate", data.timer);
+
+      savePartialDataToFile(data);
+
+      if (data.timer.remainingTime > 0) {
+        setTimeout(() => updateTimer(data), 1000);
+      } else {
+        data.timer.isRunning = false;
+        savePartialDataToFile(data);
+      }
+    }
+  }
 
   socket.on("startTimer", (timerData) => {
     if (!data.timer.isRunning) {
       data.timer.isRunning = true;
       data.timer.startTimestamp = Date.now();
       data.timer.remainingTime = timerData.remainingTime;
-      data.timer.lastSelectedTime = timerData.remainingTime; // Update last selected time on start
+      data.timer.lastSelectedTime = timerData.remainingTime;
 
       io.emit("timerUpdate", data.timer);
-
       updateTimer(data);
     }
   });
@@ -111,53 +282,188 @@ io.on("connection", (socket) => {
     if (data.timer.isRunning) {
       data.timer.isRunning = false;
       const elapsedTime = (Date.now() - data.timer.startTimestamp) / 1000;
-      data.timer.remainingTime = Math.max(0, data.timer.remainingTime - elapsedTime);
-      io.emit("timerUpdate", data.timer);
-      saveDataToFile(data);
+      data.timer.remainingTime = Math.max(
+        0,
+        data.timer.remainingTime - elapsedTime
+      );
+
+      io.emit("timerUpdate", data.timer); // Emit the updated timer state
+      savePartialDataToFile(data);
     }
   });
 
   socket.on("resetTimer", () => {
     data.timer.isRunning = false;
-    data.timer.remainingTime = data.timer.lastSelectedTime; // Reset to the last selected time
+    data.timer.remainingTime = data.timer.lastSelectedTime;
+
     io.emit("timerUpdate", data.timer);
-    saveDataToFile(data);
+    savePartialDataToFile(data);
   });
 
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
+  function savePartialDataToFile(updatedData) {
+    const dataFile = "scores.json";
+    try {
+      const currentData = loadData();
+      const mergedData = deepMerge(currentData, updatedData);
+
+      fs.writeFileSync(dataFile, JSON.stringify(mergedData, null, 2));
+      console.log("Data saved successfully");
+    } catch (err) {
+      console.error("Error writing data to file:", err);
+    }
+  }
+});
+
+// Function to handle donations from Tiltify webhook
+app.post("/webhook/tiltify", express.json(), (req, res) => {
+  const donationData = req.body;
+  const donationAmount = parseFloat(donationData.data.amount.value);
+  const donorName = donationData.data.donor_name;
+
+  console.log(
+    `Donation received: ${donorName} donated $${donationAmount.toFixed(2)}`
+  );
+
+  currentAmount += donationAmount;
+  fs.writeFileSync(
+    donationFile,
+    JSON.stringify({ total: currentAmount, goal: donationGoal }, null, 2)
+  );
+
+  io.emit("newDonation", { amount: currentAmount }); // Emit the new total to all connected clients
+  res.status(200).send("Webhook received");
+});
+
+app.get("/scores", (req, res) => {
+  const filePath = path.join(__dirname, "scores.json");
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading scores.json file:", err);
+      return res.status(500).json({ error: "Failed to read scores.json" });
+    }
+
+    try {
+      const jsonData = JSON.parse(data);
+      res.json(jsonData);
+    } catch (parseError) {
+      console.error("Error parsing scores.json file:", parseError);
+      res.status(500).json({ error: "Failed to parse scores.json" });
+    }
   });
 });
 
-function saveDataToFile(data) {
-  const dataFile = "scores.json";
-  fs.writeFile(dataFile, JSON.stringify(data, null, 2), (err) => {
-    if (err) {
-      console.error("Error writing data to file:", err);
-    } else {
-      console.log("Data saved successfully");
-    }
-  });
-}
+async function getMilestones() {
+  try {
+    const response = await axios.get(
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
 
-function updateTimer(data) {
-  if (data.timer.isRunning) {
-    const elapsedTime = (Date.now() - data.timer.startTimestamp) / 1000;
-    data.timer.remainingTime = Math.max(0, data.timer.remainingTime - elapsedTime);
-    data.timer.startTimestamp = Date.now();
+    console.log("Full milestones response:", response.data);
 
-    io.emit("timerUpdate", data.timer);
+    const milestones = response.data.data.map((milestone) => ({
+      ...milestone,
+      amount: parseFloat(milestone.amount.value),
+    }));
 
-    if (data.timer.remainingTime > 0) {
-      setTimeout(() => updateTimer(data), 1000);
-    } else {
-      data.timer.isRunning = false;
-      saveDataToFile(data);
-    }
+    return milestones;
+  } catch (error) {
+    console.error(
+      "Error fetching milestones data:",
+      error.response ? error.response.data : error.message
+    );
+    return []; // Return empty array on error
   }
 }
 
-// Start the server
-server.listen(PORT, HOST, () => {
+// Function to get top donations data
+async function getTopDonators() {
+  try {
+    const oneHourAgo = new Date(
+      Date.now() - donosLastMins * timeToCheck * 1000
+    ).toISOString();
+
+    const response = await axios.get(
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/donations`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+
+    const donations = response.data.data;
+
+    if (!donations) {
+      console.error("No donations found");
+      return [];
+    }
+
+    // Extract amount from the nested object
+    const recentDonations = donations
+      .map((donation) => {
+        const amount = donation.amount?.value; // Adjust based on the exact structure of the amount object
+        return {
+          ...donation,
+          amount: amount ? parseFloat(amount) : 0, // Ensure amount is a number
+        };
+      })
+      .filter(
+        (donation) => new Date(donation.created_at) > new Date(oneHourAgo)
+      );
+
+    const topDonators = recentDonations
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5)
+      .map((donation) => ({
+        donor_name: donation.donor_name,
+        amount: donation.amount,
+        donor_comment: donation.donor_comment || "null",
+        completed_at: donation.completed_at,
+      }));
+
+    console.log("Top 5 Donators in the last hour:");
+    topDonators.forEach((donor) => {
+      console.log(`- ${donor.donor_name}: $${donor.amount}`);
+    });
+
+    return topDonators;
+  } catch (error) {
+    console.error(
+      "Error fetching donations:",
+      error.response ? error.response.data : error.message
+    );
+    return []; // Return empty array on error
+  }
+}
+
+// Endpoint to fetch campaign data, milestones, and top donators
+app.get("/campaign", async (req, res) => {
+  try {
+    const milestones = await getMilestones();
+    const topDonators = await getTopDonators();
+    const sortedMilestones = milestones.sort((a, b) => a.amount - b.amount); // Sort by milestone amount
+    const currentMilestone = sortedMilestones
+      .filter((m) => m.amount <= currentAmount)
+      .slice(-1)[0]; // Get the most recent milestone
+    const nextMilestone = sortedMilestones.find(
+      (m) => m.amount > currentAmount
+    ); // Get the next milestone
+    res.json({
+      currentAmount,
+      currentMilestone: currentMilestone || null,
+      nextMilestone: nextMilestone || null,
+      topDonators: topDonators || [],
+    });
+  } catch (error) {
+    console.error("Error fetching campaign data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Start the server and acquire the initial OAuth token
+server.listen(PORT, HOST, async () => {
   console.log(`Server running at http://${HOST}:${PORT}/`);
+  await getOAuthToken(); // Fetch OAuth token on server start
 });
