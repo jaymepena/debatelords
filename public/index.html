@@ -11,7 +11,19 @@
 </head>
 
 <body>
-    <img class="top-logo" src="images/debatelords-logo.svg" />
+    <div id="donation-progress-container">
+        <div id="donation-progress-bar">
+            <div class="progress-bar-wrapper">
+                <div id="current-amount" class="progress-bar" style="width: 0%;">$0.00</div>
+                <div id="progress-percentage"></div>
+            </div>
+        </div>        
+        <div class="donation-milestones">
+            <span id="goal-label">Overall Goal:<span id="total-goal"></span></span>
+            <span id="raised-label">Raised:<span id="current-raised"></span></span>
+            <span id="next-milestone-label">Next Milestone:<span id="current-milestone-raised"></span></span>
+        </div>
+    </div>    
     <svg version="1.1" id="control-panel" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
         x="0px" y="0px" viewBox="0 0 1920 1080" style="enable-background:new 0 0 1920 1080;" xml:space="preserve">
         <g>
@@ -175,9 +187,11 @@
                 <path class="outline-path"
                     d="M689,138v110l-274,0V138H689 M689.33,128H414.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
                     c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C699,132.16,694.67,128,689.33,128L689.33,128z" />
-                    <foreignObject x="417" y="143" width="270" height="100">
-                        <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 1</div>
-                      </foreignObject>
+                <foreignObject x="417" y="143" width="270" height="100">
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text"
+                        style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">
+                        Name 1</div>
+                </foreignObject>
             </g>
             <g id="name-panel-2">
                 <path class="name-panel" d="M718.67,253c-2.58,0-4.67-1.92-4.67-4.29V137.29c0-2.36,2.1-4.29,4.67-4.29h274.66
@@ -186,7 +200,9 @@
                     d="M993,138v110l-274,0V138H993 M993.33,128H718.67c-5.34,0-9.67,4.16-9.67,9.29v111.43
                     c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1003,132.16,998.67,128,993.33,128L993.33,128z" />
                 <foreignObject x="721" y="143" width="270" height="100">
-                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 2</div>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text"
+                        style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">
+                        Name 2</div>
                 </foreignObject>
             </g>
             <g id="name-panel-3">
@@ -196,7 +212,9 @@
                     d="M1297,138v110l-274,0V138H1297 M1297.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
                     c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1307,132.16,1302.67,128,1297.33,128L1297.33,128z" />
                 <foreignObject x="1025" y="143" width="270" height="100">
-                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 3</div>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text"
+                        style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">
+                        Name 3</div>
                 </foreignObject>
             </g>
             <g id="name-panel-4">
@@ -206,7 +224,9 @@
                     d="M1601,138v110l-274,0V138H1601 M1601.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
                     c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1611,132.16,1606.67,128,1601.33,128L1601.33,128z" />
                 <foreignObject x="1329" y="143" width="270" height="100">
-                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 4</div>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text"
+                        style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">
+                        Name 4</div>
                 </foreignObject>
             </g>
             <g id="name-panel-5">
@@ -216,10 +236,14 @@
                     d="M1905,138v110l-274,0V138H1905 M1905.33,128h-274.66c-5.34,0-9.67,4.16-9.67,9.29v111.43
                     c0,5.13,4.33,9.29,9.67,9.29h274.66c5.34,0,9.67-4.16,9.67-9.29V137.29C1915,132.16,1910.67,128,1905.33,128L1905.33,128z" />
                 <foreignObject x="1633" y="143" width="270" height="100">
-                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text" style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">Name 5</div>
+                    <div xmlns="http://www.w3.org/1999/xhtml" class="name-text"
+                        style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%; text-align: center;">
+                        Name 5</div>
                 </foreignObject>
             </g>
         </g>
+        <image class="top-logo" xlink:href="images/debatelords-logo.svg" x="197" y="620"
+            transform="translate(150, 150) scale(1.2) translate(-150, -150)" />
         <g id="timer-controls">
             <g id="timer-reset">
                 <path id="reset-background" class="button reset"
