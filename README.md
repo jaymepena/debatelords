@@ -39,6 +39,7 @@ Talent will press the button, the things will update, the world will keep spinni
    ```sh
    npm install
    ```
+  2.5 - ENV file is in the design drive under 2024/Twitch/TCSD/.env
 3. Install IIS (see Below)
 4. Run!
    ```sh
