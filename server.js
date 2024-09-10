@@ -255,13 +255,13 @@ io.on("connection", (socket) => {
 
       io.emit("timerUpdate", data.timer);
 
-      savePartialDataToFile(data);
+      savePartialDataToFile({timer: data.timer});
 
       if (data.timer.remainingTime > 0) {
         setTimeout(() => updateTimer(data), 1000);
       } else {
         data.timer.isRunning = false;
-        savePartialDataToFile(data);
+        savePartialDataToFile({timer: data.timer});
       }
     }
   }
@@ -288,17 +288,19 @@ io.on("connection", (socket) => {
       );
 
       io.emit("timerUpdate", data.timer); // Emit the updated timer state
-      savePartialDataToFile(data);
+      savePartialDataToFile({timer: data.timer});
     }
   });
 
   socket.on("resetTimer", () => {
     data.timer.isRunning = false;
     data.timer.remainingTime = data.timer.lastSelectedTime;
-
+    data.timer.startTimestamp = null;  // Reset the startTimestamp as well
+  
     io.emit("timerUpdate", data.timer);
-    savePartialDataToFile(data);
+    savePartialDataToFile({timer: data.timer});
   });
+  
 
   function savePartialDataToFile(updatedData) {
     const dataFile = "scores.json";
@@ -437,6 +439,25 @@ async function getTopDonators() {
     return []; // Return empty array on error
   }
 }
+
+app.get("/scores", (req, res) => {
+  const filePath = path.join(__dirname, "scores.json");
+
+  fs.readFile(filePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading scores.json file:", err);
+      return res.status(500).json({ error: "Failed to read scores.json" });
+    }
+
+    try {
+      const jsonData = JSON.parse(data);
+      res.json(jsonData);
+    } catch (parseError) {
+      console.error("Error parsing scores.json file:", parseError);
+      res.status(500).json({ error: "Failed to parse scores.json" });
+    }
+  });
+});
 
 // Endpoint to fetch campaign data, milestones, and top donators
 app.get("/campaign", async (req, res) => {

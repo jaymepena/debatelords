@@ -301,6 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
       remainingTime = time;
       updateTimerDisplay(time);
       updatePieChart(time, time);
+      socket.emit("resetTimer");
     });
   });
 

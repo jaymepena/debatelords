@@ -23,16 +23,16 @@
   },
   "scores": {
     "1": 0,
-    "2": 4,
+    "2": 29,
     "3": 0,
-    "4": 5,
+    "4": 7,
     "5": 0
   },
   "timer": {
     "startTime": 1725469283043,
-    "remainingTime": 109.80599999999998,
+    "remainingTime": 90,
     "isRunning": false,
-    "startTimestamp": 1725925925736,
-    "lastSelectedTime": 120
+    "startTimestamp": null,
+    "lastSelectedTime": 90
   }
 }
