@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3000;
 const clientId = process.env.TILTIFY_CLIENT_ID;
 const clientSecret = process.env.TILTIFY_CLIENT_SECRET;
 const campaignId = process.env.TILTIFY_CAMPAIGN_ID;
-const donosLastMins = 240;
+const donosLastMins = 60;
 const timeToCheck = 60;
 
 app.use(express.static("public"));
@@ -66,7 +66,7 @@ app.get("/campaign-id", (req, res) => {
 
 let accessToken = null;
 let currentAmount = 0;
-let donationGoal = 5000;
+let donationGoal = 0;
 const donationFile = "donations.json";
 
 // Debounce helper to delay actions (prevents multiple triggers during file edits)
@@ -315,43 +315,43 @@ io.on("connection", (socket) => {
 });
 
 // Function to handle donations from Tiltify webhook
-app.post("/webhook/tiltify", express.json(), (req, res) => {
-  const donationData = req.body;
-  const donationAmount = parseFloat(donationData.data.amount.value);
-  const donorName = donationData.data.donor_name;
+// Fetch the campaign total on a timer (e.g., every 60 seconds)
+async function fetchCurrentTotal() {
+  try {
+    const response = await axios.get(
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
 
-  console.log(
-    `Donation received: ${donorName} donated $${donationAmount.toFixed(2)}`
-  );
+    const amountRaised = parseFloat(response.data.data.amount_raised.value);
+    donationGoal = parseFloat(response.data.data.goal.value);
+    console.log(`Total amount raised: $${amountRaised}`);
+    console.log(`Goal: $${donationGoal}`);
 
-  currentAmount += donationAmount;
-  fs.writeFileSync(
-    donationFile,
-    JSON.stringify({ total: currentAmount, goal: donationGoal }, null, 2)
-  );
+    if (amountRaised !== currentAmount) {
+      currentAmount = amountRaised;
 
-  io.emit("newDonation", { amount: currentAmount }); // Emit the new total to all connected clients
-  res.status(200).send("Webhook received");
-});
+      // Save updated total amount to the file
+      fs.writeFileSync(
+        donationFile,
+        JSON.stringify({ total: currentAmount, goal: donationGoal }, null, 2)
+      );
 
-app.get("/scores", (req, res) => {
-  const filePath = path.join(__dirname, "scores.json");
-
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      console.error("Error reading scores.json file:", err);
-      return res.status(500).json({ error: "Failed to read scores.json" });
+      // Notify clients of the new total amount
+      io.emit("newDonation", { amount: currentAmount });
     }
+  } catch (error) {
+    console.error(
+      "Error fetching current total from Tiltify:",
+      error.response ? error.response.data : error.message
+    );
+  }
+}
 
-    try {
-      const jsonData = JSON.parse(data);
-      res.json(jsonData);
-    } catch (parseError) {
-      console.error("Error parsing scores.json file:", parseError);
-      res.status(500).json({ error: "Failed to parse scores.json" });
-    }
-  });
-});
+// Set up a recurring check every 3 seconds
+setInterval(fetchCurrentTotal, 3 * 1000); // 60,000 ms = 60 seconds
 
 async function getMilestones() {
   try {
@@ -466,4 +466,5 @@ app.get("/campaign", async (req, res) => {
 server.listen(PORT, HOST, async () => {
   console.log(`Server running at http://${HOST}:${PORT}/`);
   await getOAuthToken(); // Fetch OAuth token on server start
+  fetchCurrentTotal()
 });

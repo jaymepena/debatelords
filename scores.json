@@ -1,23 +1,23 @@
 {
   "players": {
     "1": {
-      "name": "Name 1 Goes Here",
+      "name": "Ludwig",
       "muted": false
     },
     "2": {
-      "name": "This is the second name",
+      "name": "Cyr",
       "muted": false
     },
     "3": {
-      "name": "Name 3",
+      "name": "Carolinekwan",
       "muted": false
     },
     "4": {
-      "name": "Name 4",
+      "name": "Chad",
       "muted": false
     },
     "5": {
-      "name": "Name 5",
+      "name": "NPMlol",
       "muted": false
     }
   },
@@ -30,9 +30,9 @@
   },
   "timer": {
     "startTime": 1725469283043,
-    "remainingTime": 0,
+    "remainingTime": 109.80599999999998,
     "isRunning": false,
-    "startTimestamp": 1725474353316,
+    "startTimestamp": 1725925925736,
     "lastSelectedTime": 120
   }
 }
