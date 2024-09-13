@@ -22,17 +22,17 @@
     }
   },
   "scores": {
-    "1": 0,
-    "2": 29,
-    "3": 0,
-    "4": 7,
-    "5": 0
+    "1": 13,
+    "2": 26,
+    "3": -7,
+    "4": 11,
+    "5": -1
   },
   "timer": {
     "startTime": 1725469283043,
-    "remainingTime": 90,
+    "remainingTime": 0,
     "isRunning": false,
-    "startTimestamp": null,
+    "startTimestamp": 1726100244445,
     "lastSelectedTime": 90
   }
 }

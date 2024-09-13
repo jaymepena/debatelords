@@ -15,8 +15,8 @@ const PORT = process.env.PORT || 3000;
 const clientId = process.env.TILTIFY_CLIENT_ID;
 const clientSecret = process.env.TILTIFY_CLIENT_SECRET;
 const campaignId = process.env.TILTIFY_CAMPAIGN_ID;
-const donosLastMins = 60;
-const timeToCheck = 60;
+const donosLastMins = 9999; //reset to 60 or other value before show
+const timeToCheck = 9999;
 
 app.use(express.static("public"));
 
@@ -42,7 +42,7 @@ async function getOAuthToken() {
 app.get("/milestones", async (req, res) => {
   try {
     const response = await axios.get(
-      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones`,
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones?limit=100`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -358,7 +358,7 @@ setInterval(fetchCurrentTotal, 3 * 1000); // 60,000 ms = 60 seconds
 async function getMilestones() {
   try {
     const response = await axios.get(
-      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones`,
+      `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/milestones?limit=100`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
@@ -464,13 +464,33 @@ app.get("/campaign", async (req, res) => {
   try {
     const milestones = await getMilestones();
     const topDonators = await getTopDonators();
-    const sortedMilestones = milestones.sort((a, b) => a.amount - b.amount); // Sort by milestone amount
-    const currentMilestone = sortedMilestones
-      .filter((m) => m.amount <= currentAmount)
-      .slice(-1)[0]; // Get the most recent milestone
-    const nextMilestone = sortedMilestones.find(
-      (m) => m.amount > currentAmount
-    ); // Get the next milestone
+    const sortedMilestones = milestones.sort((a, b) => a.amount - b.amount); // Sort milestones by amount
+
+    let currentMilestone = null;
+    let nextMilestone = null;
+
+    //currentAmount=4419; //test value
+    console.log(sortedMilestones.length);
+    for (let i = 0; i < sortedMilestones.length; i++) {
+      const milestone = sortedMilestones[i];
+      if (milestone.amount <= currentAmount) {
+        currentMilestone = milestone;
+        nextMilestone = sortedMilestones[i + 1] || milestone; // If no higher milestone, set the same milestone as next
+      } else {
+        nextMilestone = nextMilestone || milestone; // First milestone that's higher becomes next if not already set
+        break;
+      }
+      if(currentMilestone == nextMilestone){
+        currentMilestone = sortedMilestones[i - 1] || milestone;
+      }
+    }
+
+    
+    // If we didn't find a current milestone, set the first milestone as "current"
+    if (!currentMilestone) {
+      currentMilestone = sortedMilestones[0] || null;
+    }
+
     res.json({
       currentAmount,
       currentMilestone: currentMilestone || null,
@@ -482,6 +502,7 @@ app.get("/campaign", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Start the server and acquire the initial OAuth token
 server.listen(PORT, HOST, async () => {
