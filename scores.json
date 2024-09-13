@@ -1,23 +1,23 @@
 {
   "players": {
     "1": {
-      "name": "Ludwig",
-      "muted": false
-    },
-    "2": {
       "name": "Cyr",
       "muted": false
     },
+    "2": {
+      "name": "CarolineKwan",
+      "muted": false
+    },
     "3": {
-      "name": "Carolinekwan",
+      "name": "Ludwig",
       "muted": false
     },
     "4": {
-      "name": "Chad",
+      "name": "Nmplol",
       "muted": false
     },
     "5": {
-      "name": "NPMlol",
+      "name": "JasontheWeen",
       "muted": false
     }
   },
